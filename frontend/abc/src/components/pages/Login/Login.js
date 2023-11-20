@@ -1,39 +1,35 @@
-// src/components/auth/UserRegister/Register.js
+// src/components/Login/Login.js
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const Register = () => {
-  const [name, setName] = useState('');
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  const handleRegister = async () => {
+  const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:3333/register', {
-        name,
+      const response = await axios.post('http://localhost:3333/login', {
         email,
         password,
       });
 
       console.log(response.data); // Mensagem do backend
 
-      // Adicione lógica adicional conforme necessário
-
+      // Se o login for bem-sucedido, redirecione para a página desejada
+      if (response.status === 200) {
+        navigate('/dashboard'); // Substitua '/dashboard' pelo caminho desejado
+      }
     } catch (error) {
-      console.error('Registration failed:', error.message);
+      console.error('Login failed:', error.message);
     }
   };
 
   return (
     <div>
-      <h2>User Registration</h2>
+      <h2>User Login</h2>
       <form>
-        <label>Name:</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
         <label>Email:</label>
         <input
           type="email"
@@ -46,12 +42,15 @@ const Register = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="button" onClick={handleRegister}>
-          Register
+        <button type="button" onClick={handleLogin}>
+          Login
         </button>
       </form>
+      <p>
+        Não tem cadastro? <Link to="/register">Crie uma conta</Link>
+      </p>
     </div>
   );
 };
 
-export default Register;
+export default Login;
