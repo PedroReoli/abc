@@ -1,0 +1,171 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model User {
+  id        String    @id @default(uuid()) // Identificador único do usuário
+  name      String    // Nome do usuário
+  email     String    // Endereço de e-mail do usuário
+  password  String    // Senha do usuário (adicionar se necessário autenticação com senha)
+  createdAt DateTime  @default(now()) // Data e hora de criação do usuário
+  updatedAt DateTime  @updatedAt // Data e hora da última atualização do usuário
+  @@map("users") // Mapeamento para a tabela "users" no banco de dados
+}
+
+model Product {
+  id          String         @id @default(uuid()) // Identificador único do produto
+  name        String         // Nome do produto
+  description String         // Descrição do produto
+  price       Float          // Preço do produto
+  shoppingCarts ShoppingCart[] // Relação muitos para muitos com carrinhos de compras
+  wishlists   Wishlist[]      // Relação muitos para muitos com listas de desejos
+  orders      Order[]         // Relação muitos para muitos com pedidos
+  createdAt   DateTime        @default(now()) // Data e hora de criação do produto
+  updatedAt   DateTime        @updatedAt // Data e hora da última atualização do produto
+  @@map("products") // Mapeamento para a tabela "products" no banco de dados
+}
+
+model Order {
+  id           String     @id @default(uuid()) // Identificador único do pedido
+  userId       String     // Referência ao usuário que fez o pedido
+  products     Product[]  // Lista de produtos no pedido
+  totalPrice   Float      // Preço total do pedido
+  status       String     // Status do pedido (pendente, enviado, etc.)
+  shippingInfo String     // Informações de envio
+  createdAt    DateTime   @default(now()) // Data e hora de criação do pedido
+  updatedAt    DateTime   @updatedAt // Data e hora da última atualização do pedido
+  @@map("orders") // Mapeamento para a tabela "orders" no banco de dados
+}
+
+model Transaction {
+  id          String   @id @default(uuid()) // Identificador único da transação
+  orderId     String   // Referência ao pedido associado à transação
+  amount      Float    // Valor da transação
+  status      String   // Status da transação (aprovada, pendente, recusada, etc.)
+  createdAt   DateTime @default(now()) // Data e hora de criação da transação
+  updatedAt   DateTime @updatedAt // Data e hora da última atualização da transação
+  @@map("transactions") // Mapeamento para a tabela "transactions" no banco de dados
+}
+
+model Supplier {
+  id          String   @id @default(uuid()) // Identificador único do fornecedor
+  name        String   // Nome do fornecedor
+  description String   // Descrição do fornecedor
+  createdAt   DateTime @default(now()) // Data e hora de criação do fornecedor
+  updatedAt   DateTime @updatedAt // Data e hora da última atualização do fornecedor
+  @@map("suppliers") // Mapeamento para a tabela "suppliers" no banco de dados
+}
+
+model ProductReview {
+  id          String   @id @default(uuid()) // Identificador único da avaliação do produto
+  productId   String   // Referência ao produto avaliado
+  userId      String   // Referência ao usuário que fez a avaliação
+  rating      Int      // Avaliação numérica (de 1 a 5, por exemplo)
+  comment     String   // Comentário do usuário sobre o produto
+  createdAt   DateTime @default(now()) // Data e hora de criação da avaliação do produto
+  updatedAt   DateTime @updatedAt // Data e hora da última atualização da avaliação do produto
+  @@map("product_reviews") // Mapeamento para a tabela "product_reviews" no banco de dados
+}
+
+model PaymentMethod {
+  id          String   @id @default(uuid()) // Identificador único do método de pagamento
+  name        String   // Nome do método de pagamento
+  description String   // Descrição do método de pagamento
+  createdAt   DateTime @default(now()) // Data e hora de criação do método de pagamento
+  updatedAt   DateTime @updatedAt // Data e hora da última atualização do método de pagamento
+  @@map("payment_methods") // Mapeamento para a tabela "payment_methods" no banco de dados
+}
+
+model Category {
+  id          String   @id @default(uuid()) // Identificador único da categoria
+  name        String   // Nome da categoria
+  description String   // Descrição da categoria
+  createdAt   DateTime @default(now()) // Data e hora de criação da categoria
+  updatedAt   DateTime @updatedAt // Data e hora da última atualização da categoria
+  @@map("categories") // Mapeamento para a tabela "categories" no banco de dados
+}
+
+model Coupon {
+  id          String   @id @default(uuid()) // Identificador único do cupom
+  code        String   @unique // Código único do cupom
+  discount    Float    // Valor do desconto
+  expiration  DateTime // Data de validade do cupom
+  createdAt   DateTime @default(now()) // Data e hora de criação do cupom
+  updatedAt   DateTime @updatedAt // Data e hora da última atualização do cupom
+  @@map("coupons") // Mapeamento para a tabela "coupons" no banco de dados
+}
+
+model ShoppingCart {
+  id          String         @id @default(uuid()) // Identificador único do carrinho de compras
+  userId      String         // Referência ao usuário que possui o carrinho
+  products    Product[]      // Lista de produtos no carrinho
+  createdAt   DateTime       @default(now()) // Data e hora de criação do carrinho de compras
+  updatedAt   DateTime       @updatedAt // Data e hora da última atualização do carrinho de compras
+  @@map("shopping_carts") // Mapeamento para a tabela "shopping_carts" no banco de dados
+}
+
+model ShippingMethod {
+  id          String   @id @default(uuid()) // Identificador único do método de envio
+  name        String   // Nome do método de envio
+  description String   // Descrição do método de envio
+  createdAt   DateTime @default(now()) // Data e hora de criação do método de envio
+  updatedAt   DateTime @updatedAt // Data e hora da última atualização do método de envio
+  @@map("shipping_methods") // Mapeamento para a tabela "shipping_methods" no banco de dados
+}
+
+model Notification {
+  id          String   @id @default(uuid()) // Identificador único da notificação
+  userId      String   // Referência ao usuário que receberá a notificação
+  content     String   // Conteúdo da notificação
+  isRead      Boolean  @default(false) // Indica se a notificação foi lida
+  createdAt   DateTime @default(now()) // Data e hora de criação da notificação
+  updatedAt   DateTime @updatedAt // Data e hora da última atualização da notificação
+  @@map("notifications") // Mapeamento para a tabela "notifications" no banco de dados
+}
+
+model Return {
+  id          String   @id @default(uuid()) // Identificador único da devolução
+  orderId     String   // Referência ao pedido associado à devolução
+  userId      String   // Referência ao usuário que solicitou a devolução
+  status      String   // Status da devolução (pendente, aprovada, recusada, etc.)
+  reason      String   // Motivo da devolução
+  createdAt   DateTime @default(now()) // Data e hora de criação da devolução
+  updatedAt   DateTime @updatedAt // Data e hora da última atualização da devolução
+  @@map("returns") // Mapeamento para a tabela "returns" no banco de dados
+}
+
+model Refund {
+  id          String   @id @default(uuid()) // Identificador único do reembolso
+  returnId    String   // Referência à devolução associada ao reembolso
+  amount      Float    // Valor a ser reembolsado
+  status      String   // Status do reembolso (processando, concluído, etc.)
+  createdAt   DateTime @default(now()) // Data e hora de criação do reembolso
+  updatedAt   DateTime @updatedAt // Data e hora da última atualização do reembolso
+  @@map("refunds") // Mapeamento para a tabela "refunds" no banco de dados
+}
+
+model Wishlist {
+  id          String         @id @default(uuid()) // Identificador único da lista de desejos
+  userId      String         // Referência ao usuário que possui a lista de desejos
+  products    Product[]      // Lista de produtos na lista de desejos
+  createdAt   DateTime       @default(now()) // Data e hora de criação da lista de desejos
+  updatedAt   DateTime       @updatedAt // Data e hora da última atualização da lista de desejos
+  @@map("wishlists") // Mapeamento para a tabela "wishlists" no banco de dados
+}
+
+model ProductVariant {
+  id          String   @id @default(uuid()) // Identificador único da variante do produto
+  productId   String   // Referência ao produto principal
+  name        String   // Nome da variante (por exemplo, "Tamanho: Grande")
+  price       Float    // Preço específico para esta variante
+  createdAt   DateTime @default(now()) // Data e hora de criação da variante do produto
+  updatedAt   DateTime @updatedAt // Data e hora da última atualização da variante do produto
+  @@map("product_variants") // Mapeamento para a tabela "product_variants" no banco de dados
+}
